@@ -1,0 +1,7 @@
+db : INFO : 2024-08-21 00:56:02,232 : Connected to the database successfully.
+db : INFO : 2024-08-21 00:56:02,924 : macrotrends_pe_pb_hist table created successfully.
+db : INFO : 2024-08-21 00:56:03,616 : Table created successfully.
+db : INFO : 2024-08-21 00:56:34,978 : Sent 36 rows to 'macrotrends_pe_pb_hist' table.
+db : INFO : 2024-08-21 00:56:35,671 : Sent 1 rows to 'current_ratios' table.
+db : INFO : 2024-08-21 00:56:56,244 : Database connection closed.
+data_poller : INFO : 2024-08-21 00:56:56,245 : Polling stopped by user.
