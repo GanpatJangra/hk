@@ -41,9 +41,9 @@ class DataPoller:
             raise Exception(f"Error occurred when fetching exchange tickers ({self.exchanges}):", e)
         
         # Instantiate a new database connection
-        with PostgreSQL(db_name='myproject', 
-                        user='myproject', 
-                        password='myproject', 
+        with PostgreSQL(db_name='sample_database', 
+                        user='sample_user', 
+                        password='sample_password', 
                         host='localhost',
                         port='5432') as database:
             logger.debug(f"P/B & P/E Polling started for {len(all_tickers_df)} tickers. Est. time: ~{(len(all_tickers_df) * 20)/3600:.1f} hours.")
