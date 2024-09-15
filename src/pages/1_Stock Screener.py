@@ -200,7 +200,7 @@ def download_stock_report_txt(symbol: str, company_name: str, time_series_data: 
 @st.cache_data(ttl=1800)
 def load_data() -> tuple[pd.DataFrame, pd.DataFrame]:
     # Connect to the PostgreSQL database
-    db = PostgreSQL(db_name='sample_database', user='sample_user', password='sample_password', host='172.105.101.61', port='5432')
+    db = PostgreSQL(db_name='sample_database', user='sample_user', password='sample_password', host='localhost', port='5432')
     db.connect()
     
     ratio_history_df = db.load_report_dataframe()
