@@ -38,7 +38,8 @@ class DataPoller:
             # Fetch all tickers from the exchanges
             all_tickers_df = self.api.get_exchange_tickers(self.exchanges)
         except Exception as e:
-            raise Exception(f"Error occurred when fetching exchange tickers ({self.exchanges}):", e)
+            logger.error(f"Error occurred when fetching exchange tickers ({self.exchanges}): {e}")
+            return
         
         # Instantiate a new database connection
         with PostgreSQL(db_name='sample_database', 
@@ -60,7 +61,7 @@ class DataPoller:
                     # Sleep for the ratelimit
                     self.do_sleep()
                 except Exception as e:
-                    logger.warn(f"Could not fetch P/B history for {r['url']}:", e)
+                    logger.warning(f"Could not fetch P/B history for {r['url']}: {e}")
                     # Skip this ticker because we need the P/B history df as a foundation
                     continue
                 
@@ -73,7 +74,7 @@ class DataPoller:
                     # Sleep for the ratelimit
                     self.do_sleep()
                 except Exception as e:
-                    logger.warn(f"Could not fetch P/B history for {r['url']}:", e)
+                    logger.warning(f"Could not fetch P/E history for {r['url']}: {e}")
                     # Sleep for the ratelimit
                     self.do_sleep()
                     
@@ -83,10 +84,9 @@ class DataPoller:
                     concat_df.sort_values('date', inplace=True, ascending=False)
                     ratio_history_df_chunk.append(concat_df)
                 except Exception as e:
-                    logger.warn(f"Could not concatenate P/B and P/E history for {r['symbol']} ({r['full_name']}):", e)
+                    logger.warning(f"Could not concatenate P/B and P/E history for {r['symbol']} ({r['full_name']}): {e}")
                     
                 # Build the row for current P/B and P/E
-                # Symbol, Last_Update, PB_Ratio, PE_Ratio
                 current_ratio_rows.append({
                     'symbol': r['symbol'],
                     'last_update': pd.Timestamp.now(),
@@ -94,12 +94,12 @@ class DataPoller:
                     'pe_ratio': current_pe
                 })
                 
-                # store the dataframes immediately
+                # Store the dataframes immediately
                 try:
                     database.store_report_dataframes([concat_df])
                     logger.debug(f"Stored historical ratio data for {r['symbol']} ({r['full_name']}).")
                 except Exception as e:
-                    logger.warning(f"An error occurred when storing historical ratio data for {r['symbol']} ({r['full_name']}):", exc_info=e)
+                    logger.warning(f"An error occurred when storing historical ratio data for {r['symbol']} ({r['full_name']}):", exc_info=True)
                 finally:
                     ratio_history_df_chunk.clear()                    
                     
@@ -107,7 +107,7 @@ class DataPoller:
                     database.store_current_ratio_dataframes([pd.DataFrame(current_ratio_rows)])
                     logger.debug(f"Stored current ratio data for {r['symbol']} ({r['full_name']}).")
                 except Exception as e:
-                    logger.warning(f"An error occurred when storing current ratio data for {r['symbol']} ({r['full_name']}):", exc_info=e)
+                    logger.warning(f"An error occurred when storing current ratio data for {r['symbol']} ({r['full_name']}):", exc_info=True)
                 finally:
                     current_ratio_rows.clear()
                     
@@ -133,4 +133,3 @@ class DataPoller:
                 wait_time = base_wait_time * (2 ** retries)
                 logger.info(f"Retrying in {wait_time} seconds...")
                 time.sleep(wait_time)
-            
