@@ -33,7 +33,7 @@ class DataPoller:
         
         # Get all tickers from the exchanges
         try:
-            logger.debug(f"Fetching exchange tickers ({self.exchanges})")
+            # logger.debug(f"Fetching exchange tickers ({self.exchanges})")
         
             # Fetch all tickers from the exchanges
             all_tickers_df = self.api.get_exchange_tickers(self.exchanges)
@@ -47,7 +47,7 @@ class DataPoller:
                         password='sample_password', 
                         host='localhost',
                         port='5432') as database:
-            logger.debug(f"P/B & P/E Polling started for {len(all_tickers_df)} tickers. Est. time: ~{(len(all_tickers_df) * 20)/3600:.1f} hours.")
+            # logger.debug(f"P/B & P/E Polling started for {len(all_tickers_df)} tickers. Est. time: ~{(len(all_tickers_df) * 20)/3600:.1f} hours.")
             
             ratio_history_df_chunk = []
             current_ratio_rows = []
@@ -56,7 +56,7 @@ class DataPoller:
                 try:
                     pb_history_df, current_pb = self.api.get_pb_ratio_history(r['symbol'], r['full_name'], r['url'])
 
-                    logger.debug(f"({i+1}/{len(all_tickers_df)}) Fetched {len(pb_history_df)} P/B history records for {r['symbol']} ({r['full_name']})")
+                    # logger.debug(f"({i+1}/{len(all_tickers_df)}) Fetched {len(pb_history_df)} P/B history records for {r['symbol']} ({r['full_name']})")
                     
                     # Sleep for the ratelimit
                     self.do_sleep()
@@ -69,7 +69,7 @@ class DataPoller:
                 try:
                     pe_history_df, current_pe = self.api.get_pe_ratio_history(r['symbol'], r['full_name'], r['url'])
                     
-                    logger.debug(f"({i+1}/{len(all_tickers_df)}) Fetched {len(pe_history_df)} P/E history records for {r['symbol']} ({r['full_name']})")
+                    # logger.debug(f"({i+1}/{len(all_tickers_df)}) Fetched {len(pe_history_df)} P/E history records for {r['symbol']} ({r['full_name']})")
                     
                     # Sleep for the ratelimit
                     self.do_sleep()
@@ -97,7 +97,7 @@ class DataPoller:
                 # Store the dataframes immediately
                 try:
                     database.store_report_dataframes([concat_df])
-                    logger.debug(f"Stored historical ratio data for {r['symbol']} ({r['full_name']}).")
+                    # logger.debug(f"Stored historical ratio data for {r['symbol']} ({r['full_name']}).")
                 except Exception as e:
                     logger.warning(f"An error occurred when storing historical ratio data for {r['symbol']} ({r['full_name']}):", exc_info=True)
                 finally:
@@ -105,7 +105,7 @@ class DataPoller:
                     
                 try:
                     database.store_current_ratio_dataframes([pd.DataFrame(current_ratio_rows)])
-                    logger.debug(f"Stored current ratio data for {r['symbol']} ({r['full_name']}).")
+                    # logger.debug(f"Stored current ratio data for {r['symbol']} ({r['full_name']}).")
                 except Exception as e:
                     logger.warning(f"An error occurred when storing current ratio data for {r['symbol']} ({r['full_name']}):", exc_info=True)
                 finally:
